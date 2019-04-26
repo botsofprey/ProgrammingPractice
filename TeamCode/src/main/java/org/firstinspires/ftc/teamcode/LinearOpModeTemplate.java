@@ -33,7 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.util.Range;
 
 
@@ -51,17 +54,24 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-@Disabled
+//@Disabled
 public class LinearOpModeTemplate extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-
+    DcMotor right;
+    DcMotor left;
+    int x = 0;
     @Override
     public void runOpMode() {
-
-
-
+        right = hardwareMap.dcMotor.get("Right");
+        left = hardwareMap.dcMotor.get("Left");
+        right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        right.setDirection(DcMotorSimple.Direction.FORWARD);
+        left.setDirection(DcMotorSimple.Direction.REVERSE);
+        right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -71,9 +81,22 @@ public class LinearOpModeTemplate extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-
-
+            if (gamepad1.left_stick_y > 0) {
+                left.setPower(1);
+                right.setPower(-1);
+            } else if (gamepad1.left_stick_y < 0) {
+                left.setPower(-1);
+                right.setPower(1);
+            } else if (gamepad1.right_stick_x > 0) {
+                left.setPower(1);
+                right.setPower(1);
+            } else if (gamepad1.right_stick_x < 0) {
+                left.setPower(-1);
+                right.setPower(1);
+            } else {
+                left.setPower(0);
+                right.setPower(0);
+            }
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
